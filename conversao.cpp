@@ -1,11 +1,8 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
-#include <string>
-#include <vector>    
-#include <tuple>
 #include  "cabecalhos.h"
-
+#include "conversao_precisa.h"
 
 string conversao(string tipo1, string label1, string valor1, string traducao1,string tipo2, string label2,string valor2, string traducao2, string tipo_prioridade, string operacao){
 
@@ -44,4 +41,10 @@ string conversao_explicita(string tipo_var, string valor){
 string conversao_atribuicao(string tipo_var, string label){
 
     return cria_temporaria(tipo_var + "(" + label + ")", tipo_var);
+}
+
+
+string retorna_nome_temp(string tipo, int num){
+    
+    return "TEMP_" + tipo + "_" +to_string(cont + num);
 }
