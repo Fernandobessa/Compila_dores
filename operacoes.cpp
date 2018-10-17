@@ -2,9 +2,9 @@
 #include <sstream>
 #include <iomanip>
 #include <string>
-#include <vector>    
-#include <tuple>
 #include  "cabecalhos.h"
+#include "conversao_precisa.h"
+
 
 
 string calc(string valor1, string valor2, string operacao){
