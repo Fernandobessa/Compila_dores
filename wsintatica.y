@@ -8,8 +8,18 @@
 #include <stdlib.h>
 #include "tabelas/cabecalhos.h"   
 
+vector<tuple<string, string, string, string>> vetor_variaveis;
+int cont = 1;
 
 using namespace std;
+
+struct atributos{
+    string label;
+    string traducao;
+    string tipo;
+    string valor;
+};
+
 
 
 %}
@@ -61,7 +71,7 @@ COMANDO     : E ';'
                     if($1.tipo != $4.tipo){
                         
                         valor = conversao_atribuicao($1.tipo, $4.label); // cria uma nova temp pra salvar a converte do valor
-                        $$.traducao = "\t" + $4.traducao + valor +"\t" +$2.label + " = " + retorna_nome_temp($1.tipo, -1) +";\n\n";
+                        $$.traducao = "\t" + $4.traducao + valor +"\t" +$2.label + " = " + retorna_nome_temp($1.tipo, 0) +";\n\n";
                         cria_variavel($1.tipo, $2.label, $4.valor);
                     }
                     else{
@@ -283,7 +293,6 @@ F           : TK_TERMINAL
 
 int main( int argc, char* argv[] )
 {
-
 
     yyparse();
 
