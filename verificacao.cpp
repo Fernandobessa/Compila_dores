@@ -5,6 +5,7 @@
 #include <vector>    
 #include <tuple>
 #include  "cabecalhos.h"
+#include "tabela_tipos.h"
 
 
 bool verifica_declaracao(string nome){
@@ -44,7 +45,7 @@ void atualiza_valor(string label,string tipo_var, string valor){
     }
 }
 
-string retorna_tipo(string label){
+string retornatipo(string label){
 
     if(!verifica_declaracao(label))
         erro_nao_declaracao(label);
@@ -63,6 +64,17 @@ string retorna_valor(string label){
     for(auto& tuple: vetor_variaveis) {
         if(label.compare(get<1>(tuple)) == 0)
             return get<3>(tuple);                 
+    }
+}
+
+string retorna_tipo(string label){
+
+    if(!verifica_declaracao(label))
+        erro_nao_declaracao(label);
+
+    for(auto& tuple: vetor_variaveis) {
+        if(label.compare(get<1>(tuple)) == 0)
+            return get<0>(tuple);                 
     }
 }
 
