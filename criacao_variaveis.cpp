@@ -13,7 +13,8 @@ string cria_variavel(string tipo_var, string label, string valor){
     valor = conversao_explicita(tipo_var, valor);
 
     auto tupla = std::make_tuple(tipo_var, label, nome, valor);
-    vetor_variaveis.push_back(tupla);
+    pilha_blocos[pilha_blocos.size()-1].push_back(tupla);
+    //vetor_variaveis.push_back(tupla);
     
     cont++; 
     return nome; 
@@ -27,4 +28,8 @@ string cria_temporaria(string valor, string tipo){
     cout<<"\t"<<nome_temp<<';'<<endl;
     cont++;
     return aux;
+}
+
+string cria_label(string nome){
+    return nome + "_" + to_string(cont_label);
 }
