@@ -8,283 +8,118 @@
 #include <stdlib.h>
 #include "tabelas/cabecalhos.h"   
 
-vector<tuple<string, string, string, string>> vetor_variaveis;
+#define YYDEBUG 1
+
+vector < vector<tuple<string, string, string, string>> > pilha_blocos;
 int cont = 1;
+int cont_label = 1;
 
 using namespace std;
-
-struct atributos{
-    string label;
-    string traducao;
-    string tipo;
-    string valor;
-};
-
-
 
 %}
 
 
 %token TK_MAIN TK_ID TK_TERMINAL
 %token TK_TIPO_INT TK_TIPO TK_OPERACAO TK_RELACIONAL TK_LOGICO
+%token TK_IF TK_ELSE TK_FOR TK_WHILE 
 
 %start S
 
 %%
 
-
-S             : TK_TIPO TK_MAIN '(' ')' BLOCO
+S           :BLOCO_PRINCIPAL
             {
-                for(auto& tuple: vetor_variaveis) 
+                 for(auto& tuple: pilha_blocos[pilha_blocos.size()-1]) 
                     cout <<"\t" << get<1>(tuple) << " " << get<2>(tuple) << " = " << get<3>(tuple) << "; " <<endl;   
 
                 cout<<"COMPILADOR WINTER\n" <<"int main()\n{\n"<<endl;
-                cout<<$5.traducao <<" return 0;\n}"<<endl;
+                cout<<$1.traducao <<" return 0;\n}"<<endl;
+            }
+
+
+BLOCO_PRINCIPAL: /*X COMANDOS_G */ MAIN
+            {
+                $$.traducao = /*$1.traducao + */ $1.traducao;
             }
             ;
 
-BLOCO        : '{' COMANDOS '}'
-            {
-                $$.traducao = $2.traducao;
-            }
+MAIN:       X TK_TIPO TK_MAIN '(' ')' BLOCO                     { $$.traducao = $6.traducao; }
             ;
 
-COMANDOS    : COMANDO COMANDOS
-            {
-                $$.traducao = $1.traducao + $2.traducao;
-            }
+X           :                                                   { pilha_blocos.push_back(vector<tuple<string, string, string, string>>()); }
+            ;   
+
+
+// COMANDOS_G   : DECLARACAO COMANDOS_G {$$.traducao = $1.traducao + $2.traducao; }            
+//             |{}
+//             ;
+
+DECLARACAO:    TK_TIPO TK_ID ';'       { gera_codigo_declaracao($$,$1, $2); }       // float media;
+            |  TK_TIPO TK_ID '=' E ';' { gera_codigo_declaracao_atribuicao($$,$1, $2, $4); } // int contador = 1;
+            ;
+
+BLOCO       : '{' COMANDOS '}'                                  { $$.traducao = $2.traducao; }
+            ;
+
+COMANDOS    : COMANDO COMANDOS                                  { $$.traducao = $1.traducao + $2.traducao; }
             |
-            ; 
-
-COMANDO     : E ';' 
-            {
-            	$$.traducao = $1.traducao;
-            }
-
-            |  TK_TIPO TK_ID '=' E ';'                            // int a = b + c * d;
-            {
-                string valor;
-                verifica_compatibilidade($1.tipo, $4.tipo);
-
-                if(!verifica_declaracao($2.label)){
-
-                    if($1.tipo != $4.tipo){
-                        
-                        valor = conversao_atribuicao($1.tipo, $4.label); // cria uma nova temp pra salvar a converte do valor
-                        $$.traducao = "\t" + $4.traducao + valor +"\t" +$2.label + " = " + retorna_nome_temp($1.tipo, 0) +";\n\n";
-                        cria_variavel($1.tipo, $2.label, $4.valor);
-                    }
-                    else{
-                        cria_variavel($1.tipo, $2.label,$4.valor);
-                        $$.traducao = "\t"+ $4.traducao + "\t" + $2.label + " = " + $4.label + ";\n";
-                    }
-                }
-                
-                else{
-                    erro_declaracao($2.label);
-                }   
-            }
-
-            | TK_ID '=' E ';'                                    // a = b + c;
-            {
-                string valor, tipo1 = retorna_tipo($1.label);
-
-                verifica_compatibilidade(tipo1, $3.tipo);
-                if(!verifica_declaracao($1.label))
-                    erro_nao_declaracao($1.label);
-
-                if(tipo1 != $3.tipo){
-                    
-                    valor = conversao_atribuicao(tipo1, $3.label); // cria uma nova temp pra salvar a converte do valor
-                    $$.traducao = '\t'+ $3.traducao + "\n" + valor +"\t" + $1.label + " = " + retorna_nome_temp(tipo1, -1) +";\n\n";
-                    atualiza_valor($1.label, $1.tipo, $3.valor);
-                }
-                else{
-                    atualiza_valor($1.label, $3.tipo, $3.valor);
-                    $$.traducao = "\t" + $3.traducao + "\t" + $1.label + " = " + $3.label + ";\n";
-                }  
-            }
-
-            | TK_TIPO TK_ID ';'                                        // int a;
-            {
-                $$.traducao = "\t" + cria_variavel($1.tipo, $2.label, string("0")) + ";\n";
-            }
+            ;   
             ;
-                
-E 			:A
-			{
-				$$.traducao = $1.traducao;
-                $$.tipo = $1.tipo;
-                $$.valor = $1.valor;
-                $$.label = $1.label;
-			}
-			|L
-			{
-				$$.traducao = $1.traducao;	
-				$$.valor = $1.valor;
-                $$.tipo = $1.tipo;
-				$$.label = $1.label;
-			}
-            | TK_TIPO '(' F ')'
-            {
-                verifica_compatibilidade($1.tipo, $3.tipo);
-                $$.label = retorna_nome_temp($1.tipo, 0);
-                $$.traducao = conversao_atribuicao($1.tipo, $3.label);
-                $$.tipo = $1.tipo;
-                $$.valor = to_string(atoi(($3.valor).c_str()) );;
 
+COMANDO     : ATRIBUICAO        { $$.traducao = $1.traducao;}
+            | DECLARACAO        { $$.traducao = $1.traducao;}
+            | IF_ELSE           { $$.traducao = $1.traducao;}
+            ;
+
+IF_ELSE:    TK_IF '(' L ')' BLOCO
+            {
+                string varTeste = retorna_nome_temp("bool", 0);
+                string labelFim = cria_label("fim_if");
+                $$.tipo = " ";
+                $$.valor = " ";
+                $$.label = " ";
+                $$.traducao = $3.traducao  + cria_temporaria(" !"+ $3.label, "bool") + "\tif( " + varTeste + " ) goto " + labelFim + ";\n" +
+                $5.traducao +"\t" + labelFim +":\n"; 
             }
-			|
-			;
-
-
-A            : A '+' T
+            |TK_IF '(' L ')' BLOCO TK_ELSE BLOCO ';'
             {
-                verifica_compatibilidade($1.tipo, $3.tipo);
-                $$.valor = calc($1.valor, $3.valor, string("+"));
-                $$.label = retorna_nome_temp($1.tipo, 0);
-                $$.tipo = $1.tipo; 
-                
-                if(!tipos_iguais($1.tipo, $3.tipo)){
 
-                    string aux = prioridade($1.tipo, $3.tipo);
-                    $$.tipo = aux;
-                    $$.traducao = conversao($1.tipo, $1.label, $1.valor, $1.traducao, $3.tipo, $3.label, $3.valor, $3.traducao, aux, "+");
-                    $$.label = retorna_nome_temp(aux, -1);
-                }
-                else
-                    $$.traducao = $1.traducao +  "\n" + $3.traducao + "\n" + cria_temporaria($1.label + " + " + $3.label, $1.tipo);
-            }
-            
-            |A '-' T
-            {
-                verifica_compatibilidade($1.tipo, $3.tipo);
-                $$.valor = calc($1.valor, $3.valor, string("-"));
-                $$.label = retorna_nome_temp($1.tipo, 0); 
-               
-                if($1.tipo != $3.tipo){
-
-                    string aux = prioridade($1.tipo, $3.tipo);
-                    $$.tipo = aux;
-                    $$.traducao = conversao($1.tipo, $1.label, $1.valor, $1.traducao, $3.tipo, $3.label, $3.valor, $3.traducao, aux, "-");
-                    $$.label =  retorna_nome_temp(aux, -1);
-                }
-                else
-                    $$.traducao =  $1.traducao +  "\n" + $3.traducao + "\n" + cria_temporaria($1.label + " - " + $3.label, $1.tipo);          
-            }
-
-            | T
-            {
-                $$.traducao = $1.traducao;
-                $$.tipo = $1.tipo;
-                $$.valor = $1.valor;
-                $$.label = $1.label;
-            }
-             ;
-
-T             :T '*' F 
-            {
-                verifica_compatibilidade($1.tipo, $3.tipo);
-                $$.valor = calc($1.valor, $3.valor, string("*"));
-                $$.label = retorna_nome_temp($1.tipo, 0); 
-                $$.tipo = $1.tipo; 
-                
-                if(!tipos_iguais($1.tipo, $3.tipo)){
-
-                    string aux = prioridade($1.tipo, $3.tipo);
-                    $$.tipo = aux;
-                    $$.traducao = conversao($1.tipo, $1.label, $1.valor, $1.traducao, $3.tipo, $3.label, $3.valor, $3.traducao, aux, "*");
-                    $$.label = retorna_nome_temp(aux, -1); 
-                }
-                else
-                    $$.traducao =  $1.traducao +  "\n" + $3.traducao + "\n" + cria_temporaria($1.label + " * " + $3.label, $1.tipo);   
-            }
-            | T '/' F
-            {
-                verifica_compatibilidade($1.tipo, $3.tipo);
-                $$.valor = calc($1.valor, $3.valor, string("/"));
-                $$.label = retorna_nome_temp($1.tipo, 0); 
-                $$.tipo = $1.tipo; 
-                
-                if(!tipos_iguais($1.tipo, $3.tipo)){
-
-                    string aux = prioridade($1.tipo, $3.tipo);
-                    $$.tipo = aux;
-                    $$.traducao = conversao($1.tipo, $1.label, $1.valor, $1.traducao, $3.tipo, $3.label, $3.valor, $3.traducao, aux, "/");
-                    $$.label = retorna_nome_temp(aux, -1); 
-                }
-                else
-                    $$.traducao =  $1.traducao +  "\n" + $3.traducao + "\n" + cria_temporaria($1.label + " / " + $3.label, $1.tipo);    
-            }
-            | F
-            {
-                $$.valor = $1.valor;
-                $$.tipo = $1.tipo;
-                $$.label = $1.label;
-                $$.traducao = " ";
             }
             ;
 
 
-L 			:L TK_LOGICO R
-			{
-                $$.label = retorna_nome_temp("bool", 0); 
-                $$.valor = calc($1.valor, $3.valor, $2.traducao);
-				$$.tipo = "bool";
-                $$.traducao = $1.traducao +"\n" + $3.traducao + "\n"+ cria_temporaria($1.label + $2.traducao + $3.label, $$.tipo);
-			}
-			|TK_LOGICO F
-			{
-                $$.label = retorna_nome_temp("bool", 0); 
-				$$.valor = calc($2.valor,string(" "), $1.traducao);
-				$$.tipo = "bool";
-                $$.traducao = $2.traducao +"\n" + cria_temporaria($1.traducao + $2.label, $$.tipo);
-            }
-			;
-			|R
-			{
-				$$.traducao = $1.traducao;
-				$$.valor = $1.valor;
-				$$.label = $1.label;
-				$$.tipo = $1.tipo;
-			}
-			;   
+ATRIBUICAO: TK_ID '=' E ';' { gera_codigo_atribuicao($$,$1, $3); }              // a = 7.5; 
+            ;
+                
+
+E           : A                         {  sobe_valor($$, $1); }
+            | L                         {  sobe_valor($$, $1); }
+            | TK_TIPO '(' F ')'         { gera_codigo_conversao($$, $1, $3);}   //Converção explícita
+            ;
+
+A           : A '+' T                   { gera_codigo_operacao($$, $1, "+", $3); }
+            | A '-' T                   { gera_codigo_operacao($$, $1, "-", $3); }
+            | T                         { sobe_valor($$, $1); }
+            ;
+
+T           :  T '*' F          { gera_codigo_operacao($$, $1, "*", $3); }
+            |  T '/' F          { gera_codigo_operacao($$, $1, "/", $3); }
+            |  F                { $$.valor = $1.valor; $$.tipo = $1.tipo; $$.label = $1.label; $$.traducao = " "; }
+            ;
 
 
-R 			:A TK_RELACIONAL A
-			{
-                verifica_compatibilidade($1.tipo, $3.tipo);
+L           :L TK_LOGICO R      { gera_codigo_operacao_logica($$, $1, $2, $3); }    // a || b
+            |TK_LOGICO F        { gera_codigo_operacao_logica2($$, $1, $2);    }    // !a
+            |R                  { sobe_valor($$, $1); }
+            ;   
 
-                $$.label = retorna_nome_temp("bool", 0); 
-                $$.valor = calc($1.valor, $3.valor, $2.traducao);
-                $$.tipo = "bool"; 
-                $$.traducao = $1.traducao +  "\n" + $3.traducao + "\n" + cria_temporaria($1.label + $2.traducao + $3.label, $$.tipo);
-			}
 
-			|TK_LOGICO '(' L ')'
-			{
-                $$.label = retorna_nome_temp("bool", 0); 
-				$$.valor = calc($3.valor,string(" "), $1.traducao);
-				$$.tipo = "bool";
-                $$.traducao = $3.traducao +"\n" + cria_temporaria($1.traducao + $3.label, $$.tipo);
-			}
-			;
+R           :A TK_RELACIONAL A      {    gera_codigo_operacao_logica($$, $1, $2, $3); }     // 2 > 3
+            |TK_LOGICO '(' L ')'    {    gera_codigo_operacao_logica2($$, $1, $3); }        // !( a > b )
+            ;
 
-F           : TK_TERMINAL
-            {
-                $$.valor = $1.valor;
-                $$.tipo = $1.tipo;
-                $$.label = $1.valor;
-                $$.traducao = " ";
-            }
-
-            | TK_ID
-            {
-                $$.valor = retorna_valor($1.label);
-                $$.tipo = $1.tipo;
-                $$.label = $1.label;
-                $$.traducao = " ";
-            }
+F           : TK_TERMINAL { sobe_valor_terminal($$, $1); }
+            | TK_ID       { sobe_valor_id($$, $1); }
             ;
             
 %%
@@ -293,7 +128,9 @@ F           : TK_TERMINAL
 
 int main( int argc, char* argv[] )
 {
-
+    #if YYDEBUG
+        yydebug = 1;
+    #endif
     yyparse();
 
     return 0;
