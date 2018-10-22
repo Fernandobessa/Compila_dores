@@ -13,8 +13,19 @@
 
 using namespace std;
 
+extern int yy_flex_debug;
+
+
 extern int cont;
-extern vector<tuple<string, string, string, string>> vetor_variaveis;
+extern int cont_label;
+extern vector < vector<tuple<string, string, string, string>> > pilha_blocos;
+
+struct atributos{
+    string label;
+    string traducao;
+    string tipo;
+    string valor;
+};
 
 
 
@@ -36,6 +47,17 @@ string conversao(string,string, string, string,string, string, string, string, s
 string converte(string, string, string, string, string);
 int tipos_iguais(string, string);
 string retorna_nome_temp(string, int);
+string cria_label(string);
+void gera_codigo_operacao(atributos&, atributos, string, atributos);
+void gera_codigo_declaracao(atributos&, atributos, atributos);
+void gera_codigo_atribuicao(atributos&ss, atributos s1, atributos s3);
+void gera_codigo_declaracao_atribuicao(atributos&, atributos, atributos, atributos);
+void sobe_valor(atributos &, atributos);
+void sobe_valor_terminal(atributos &, atributos);
+void sobe_valor_id(atributos &, atributos);
+void gera_codigo_operacao_logica(atributos &, atributos, atributos, atributos);
+void gera_codigo_conversao(atributos &, atributos, atributos);
+void gera_codigo_operacao_logica2(atributos &, atributos, atributos);
 
 
 #endif
