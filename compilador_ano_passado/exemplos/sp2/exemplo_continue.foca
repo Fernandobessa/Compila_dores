@@ -1,0 +1,23 @@
+int main(void)
+{
+ int i;
+ 
+ for(i = 1; i < 10; i++)
+ {
+ if (i % 2 == 0) //se i for par não faz nada e pula para a próxima iteração
+ {
+ continue;
+ }
+ else // senão imprime os ímpares
+ {
+ cout << "Numero: " i ;
+ }
+ 
+ cout << "Numero impar!\n\n";
+ 
+ }
+ 
+ cout << "Final do programa!\n\n";
+ 
+ return 0;
+}

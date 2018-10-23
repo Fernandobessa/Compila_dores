@@ -1,0 +1,18 @@
+int main(int, char **) 
+{ 
+    char ola[4];
+ 
+    ola[0] = 'o'; 
+    ola[1] = 'l'; 
+    ola[2] = 'a'; 
+    ola[3] = 0;
+ 
+    printf(ola);
+
+    char hello[] = "hello";
+ 
+    printf(hello);
+ 
+ 
+    return 0; 
+}

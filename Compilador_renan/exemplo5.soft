@@ -1,0 +1,21 @@
+function main()
+begin
+        char vet1[4] = {'a', 'b', 'c', 'd'};
+        char vet2[4] = {'w', 'x', 'y', 'z'};
+        int j = 3;
+
+        readln("matriz 1:");
+        readln(vet1[]);
+        readln("matriz 2:");
+        readln(vet2[]);
+    
+        for(int i=0; i<4; i++)
+        begin
+            vet1[i]<->vet2[j];
+            j--;
+        end
+        readln("matriz 1 invertida:");
+        readln(vet1[]);
+        readln("matriz 2 invertida:");
+        readln(vet2[]);
+end

@@ -1,0 +1,10 @@
+int main(){
+	
+	int a = 5 + 3;
+
+	int b = 5 - 3;
+
+	int c = 5 * 3;
+
+	int d = 15 / 5;
+}

@@ -1,0 +1,19 @@
+procedure change(int x, int y)
+begin
+    x!;
+    y.^2;
+end
+
+function main()
+begin
+    int x = 3;
+    int y = 5;
+
+    readln(x);
+    readln(y);
+
+    change(x,y);
+
+    readln(x);
+    readln(y);
+end

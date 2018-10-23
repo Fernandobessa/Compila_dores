@@ -1,0 +1,14 @@
+function main()
+begin
+    int x[10] = {1,2,2,2,3,4,5,6,7,9,1,2};
+    int total = 0;
+
+    foreach(10 in x as y)
+    begin
+        total++;
+    end
+
+    readln(total);
+
+    readln(x[]);
+end

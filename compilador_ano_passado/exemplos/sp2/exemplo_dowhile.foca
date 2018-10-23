@@ -1,0 +1,23 @@
+int main()
+{
+
+	int nr;
+
+	do
+	{
+
+		cout <<"Digite um numero (0 para finalizar): ";
+
+		cin >> nr;
+
+		if (nr % 2 == 0)
+			cout <<"Este numero e par\n";
+
+		else
+		cout <<"Este numero e impar\n";
+
+	} while (nr!=0);
+	
+	return 0;
+
+}

@@ -1,0 +1,14 @@
+int x = 4;
+
+function main()
+begin
+    global x;
+
+    
+    readln("O valor usando fatorial é: " + x);
+
+    x = 3;
+
+
+    readln("O valor usando expoente é: " + x);
+end

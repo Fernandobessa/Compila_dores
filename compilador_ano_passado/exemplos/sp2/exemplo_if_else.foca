@@ -1,0 +1,14 @@
+int main ()
+{
+	int num;
+	cout << "Digite um numero: ";
+	cin >> num;
+	if (num > 10)
+   		if (num < 20)
+   			cout << "\n\nNumero valido!\n";
+    else
+   		cout << "\n\nNumero invalido";
+	return(0);
+}
+
+//este exemplo testa os comandos if/else e o contexto. 

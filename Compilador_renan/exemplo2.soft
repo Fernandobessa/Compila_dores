@@ -1,0 +1,27 @@
+function supersoma(int super) : int 
+begin
+    super.^2;
+    
+    super += super*2;
+    
+    return super;
+end
+    
+function soma(int x, float y) : int
+begin
+    int total = x+y;
+    
+    total = supersoma(total);
+    
+    return total;
+end
+    
+function main()
+begin
+    int x[10] = {1,2,3,4,5};
+    int valor = 3;
+
+    float resultado = soma(valor,x[0]);
+
+    readln("Resultado da super soma " + resultado);
+end

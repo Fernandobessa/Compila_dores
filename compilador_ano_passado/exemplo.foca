@@ -1,0 +1,17 @@
+int g;
+
+int ar(int v){
+	
+}
+
+int main()
+{	
+
+	int e;
+
+	int w;
+
+	w = ar(e);
+
+}
+

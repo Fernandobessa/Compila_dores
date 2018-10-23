@@ -1,0 +1,13 @@
+int main ()
+{
+	int num;
+	cout << "Digite um numero: ";
+	cin >> num;
+	if (num > 10)
+   		cout << "\n\nO numero e maior que 10";
+	if (num == 10)
+        cout << "\n\nVoce acertou!\n";
+    if (num < 10)
+   		cout << "\n\nO numero e menor que 10";
+	return(0);
+}

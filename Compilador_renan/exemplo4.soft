@@ -1,0 +1,14 @@
+function main()
+begin
+    float mat[5][4];
+    
+    for(int i=0; i<5; i++)
+    begin
+        for(int j=0; j<4; j++)
+        begin
+            mat[i][j] += i;
+        end
+    end
+
+    readln(mat[][]);
+end

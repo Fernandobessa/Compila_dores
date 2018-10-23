@@ -1,0 +1,31 @@
+int main()
+{
+	var var_int = 5;
+
+	var var_float = 7.4;
+
+	int a = 6;
+	int aa;
+	int as, ad;
+	int af, ag = 666;
+
+	float b = 9.0;
+	float bb;
+
+	char c = 'r';
+	char cc;
+
+	bool d = false;
+	bool dd = true;
+	bool ddd;
+
+	var conver_float = a * b + 7;
+	var conver_float2 = a / b - 7;
+
+	bool e = a > var_int;
+	bool ee = a < var_int;
+	bool eee = a >= var_int;
+	bool eeee = a <= var_int;
+	bool eeeee = a == var_int;
+	bool eeeeee = a != var_int;
+}

@@ -1,0 +1,21 @@
+int main(){
+	
+	int a = 5;
+
+	int b = 10;
+
+	float c = 3.5;
+
+	bool d;
+
+	char e = de43r;
+
+
+	var f = a + b;
+
+	var g = b + c;
+
+	var h = b + e;
+
+	var i = c + e;
+}
